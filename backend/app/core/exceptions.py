@@ -25,6 +25,10 @@ class KubernetesClientError(KubeSightError):
     """Raised when the backend cannot communicate with Kubernetes."""
 
 
+class KubernetesResourceNotFoundError(KubernetesClientError):
+    """Raised when a requested Kubernetes resource does not exist."""
+
+
 class IncidentDetectionError(KubeSightError):
     """Raised when incident detection cannot complete safely."""
 

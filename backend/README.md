@@ -45,3 +45,16 @@ POST /api/v1/auth/login
 POST /api/v1/auth/token
 GET  /api/v1/auth/me
 ```
+
+Kubernetes endpoints:
+
+```text
+GET /api/v1/kubernetes/summary
+GET /api/v1/kubernetes/namespaces
+GET /api/v1/kubernetes/namespaces/{namespace}/deployments
+GET /api/v1/kubernetes/namespaces/{namespace}/services
+GET /api/v1/kubernetes/namespaces/{namespace}/pods
+GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}
+GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/events
+GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs
+```

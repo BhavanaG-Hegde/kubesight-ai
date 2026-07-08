@@ -97,8 +97,18 @@ POST http://localhost:8000/api/v1/auth/token
 GET  http://localhost:8000/api/v1/auth/me
 ```
 
+Kubernetes inspection:
+
+```text
+GET http://localhost:8000/api/v1/kubernetes/summary
+GET http://localhost:8000/api/v1/kubernetes/namespaces
+GET http://localhost:8000/api/v1/kubernetes/namespaces/{namespace}/pods
+GET http://localhost:8000/api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs
+```
+
 ## Architecture Docs
 
 - [Folder structure](docs/folder-structure.md)
 - [Backend architecture](docs/backend-architecture.md)
 - [Database schema](docs/database-schema.md)
+- [Kubernetes integration](docs/kubernetes-integration.md)
