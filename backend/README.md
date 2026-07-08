@@ -87,3 +87,9 @@ POST /api/v1/ai/pods/logs/analyze
 POST /api/v1/ai/incidents/{incident_id}/analyze
 POST /api/v1/ai/ask
 ```
+
+Analytics endpoints:
+
+```text
+GET /api/v1/analytics/overview?days=30
+```

@@ -35,7 +35,7 @@ API routes
 - `IncidentDetectionService`: rule-based incident detection.
 - `MonitoringService`: orchestration for live health assessment and detection.
 - `AIAssistantService`: Ollama-backed explanations and troubleshooting steps.
-- `AnalyticsService`: dashboard aggregates and chart-ready series.
+- `AnalyticsService`: incident trends, distributions, and pod resource rankings.
 
 ## API Principles
 

@@ -168,3 +168,50 @@ export interface AIAnalysisRead {
   response: string;
   created_at: string;
 }
+
+export interface IncidentTrendPoint {
+  date: string;
+  total: number;
+  critical: number;
+  warning: number;
+  info: number;
+}
+
+export interface DistributionBucket {
+  label: string;
+  value: number;
+}
+
+export interface TopFailingPod {
+  namespace?: string | null;
+  pod_name?: string | null;
+  incident_count: number;
+  critical_count: number;
+  last_seen_at?: string | null;
+}
+
+export interface PodResourcePoint {
+  namespace: string;
+  pod_name: string;
+  cpu_millicores: number;
+  memory_mebibytes: number;
+  restart_count: number;
+  health_score: number;
+}
+
+export interface AnalyticsOverviewResponse {
+  days: number;
+  generated_at: string;
+  total_incidents: number;
+  open_incidents: number;
+  critical_incidents: number;
+  resolved_incidents: number;
+  incident_trends: IncidentTrendPoint[];
+  severity_distribution: DistributionBucket[];
+  status_distribution: DistributionBucket[];
+  incident_type_distribution: DistributionBucket[];
+  top_failing_pods: TopFailingPod[];
+  top_cpu_pods: PodResourcePoint[];
+  top_memory_pods: PodResourcePoint[];
+  top_restarting_pods: PodResourcePoint[];
+}

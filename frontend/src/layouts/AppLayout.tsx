@@ -13,6 +13,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
@@ -26,6 +27,7 @@ const drawerWidth = 260;
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: <DashboardOutlinedIcon /> },
+  { label: "Analytics", path: "/analytics", icon: <AnalyticsOutlinedIcon /> },
   { label: "Namespaces", path: "/namespaces", icon: <FolderOutlinedIcon /> },
   { label: "Incidents", path: "/incidents", icon: <ReportProblemOutlinedIcon /> },
   { label: "AI Assistant", path: "/ai", icon: <AutoAwesomeOutlinedIcon /> },

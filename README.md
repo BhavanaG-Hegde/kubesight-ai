@@ -54,7 +54,7 @@ folder layout.
 
 ## Status
 
-Current phase: Kubernetes deployment manifests and demo incident workloads.
+Current phase: analytics dashboard and chart-ready backend aggregates.
 
 ## Backend Quickstart
 
@@ -155,6 +155,12 @@ POST http://localhost:8000/api/v1/ai/incidents/{incident_id}/analyze
 POST http://localhost:8000/api/v1/ai/ask
 ```
 
+Analytics:
+
+```text
+GET http://localhost:8000/api/v1/analytics/overview?days=30
+```
+
 ## Architecture Docs
 
 - [Folder structure](docs/folder-structure.md)
@@ -164,5 +170,6 @@ POST http://localhost:8000/api/v1/ai/ask
 - [Health scoring and incident detection](docs/monitoring-rules.md)
 - [Incident history](docs/incident-history.md)
 - [AI assistant](docs/ai-assistant.md)
+- [Analytics](docs/analytics.md)
 - [CI/CD](docs/ci-cd.md)
 - [Kubernetes deployment](kubernetes/README.md)

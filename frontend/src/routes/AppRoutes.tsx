@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import { AppLayout } from "../layouts/AppLayout";
 import { AIAssistantPage } from "../pages/AIAssistantPage";
+import { AnalyticsPage } from "../pages/AnalyticsPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { IncidentsPage } from "../pages/IncidentsPage";
 import { LoginPage } from "../pages/LoginPage";
@@ -18,6 +19,7 @@ export function AppRoutes() {
         <Route element={<AppLayout />}>
           <Route index element={<Navigate replace to="/dashboard" />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/namespaces" element={<NamespacesPage />} />
           <Route path="/namespaces/:namespace/pods/:podName" element={<PodDetailPage />} />
           <Route path="/incidents" element={<IncidentsPage />} />
