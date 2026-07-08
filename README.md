@@ -23,7 +23,7 @@ Build a lightweight observability platform for Kubernetes clusters that can:
 - Kubernetes: Kubernetes Python Client, Minikube or Kind
 - AI: Ollama, Llama 3.2
 - Infrastructure: Docker, Docker Compose, Kubernetes manifests
-- CI/CD: GitHub Actions
+- CI/CD: GitHub Actions, Dependabot
 
 ## Repository Structure
 
@@ -54,7 +54,7 @@ folder layout.
 
 ## Status
 
-Current phase: backend foundation and database schema.
+Current phase: frontend foundation with CI/CD validation.
 
 ## Backend Quickstart
 
@@ -152,3 +152,4 @@ POST http://localhost:8000/api/v1/ai/ask
 - [Health scoring and incident detection](docs/monitoring-rules.md)
 - [Incident history](docs/incident-history.md)
 - [AI assistant](docs/ai-assistant.md)
+- [CI/CD](docs/ci-cd.md)
