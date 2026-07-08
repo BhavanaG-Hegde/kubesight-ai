@@ -8,7 +8,6 @@ from app.schemas.monitoring import (
     PodHealthAssessmentRead,
 )
 
-
 CRITICAL_CONTAINER_REASONS = {
     "CrashLoopBackOff",
     "OOMKilled",

@@ -37,7 +37,7 @@ def db_session() -> Generator[Session, None, None]:
 
 def test_analyze_incident_persists_ai_analysis(db_session: Session) -> None:
     incident = create_test_incident(db_session)
-    service = FakeAIAssistantService(db_session, settings=test_settings())
+    service = FakeAIAssistantService(db_session, settings=make_test_settings())
 
     analysis = service.analyze_incident(
         incident.id,
@@ -51,7 +51,7 @@ def test_analyze_incident_persists_ai_analysis(db_session: Session) -> None:
 
 def test_answer_question_uses_incident_context(db_session: Session) -> None:
     incident = create_test_incident(db_session)
-    service = FakeAIAssistantService(db_session, settings=test_settings())
+    service = FakeAIAssistantService(db_session, settings=make_test_settings())
 
     analysis = service.answer_question(
         AIQuestionRequest(
@@ -75,7 +75,7 @@ class FakeAIAssistantService(AIAssistantService):
 
 
 def create_test_incident(db_session: Session):
-    history = IncidentHistoryService(db_session, settings=test_settings())
+    history = IncidentHistoryService(db_session, settings=make_test_settings())
     response = history.persist_detection_result(
         IncidentDetectionResponse(
             namespace="payments",
@@ -100,7 +100,7 @@ def create_test_incident(db_session: Session):
     return history.incidents.get(incident_read.id)
 
 
-def test_settings() -> Settings:
+def make_test_settings() -> Settings:
     return Settings(
         monitored_cluster_name="test-cluster",
         secret_key="test-secret",

@@ -35,7 +35,7 @@ def db_session() -> Generator[Session, None, None]:
 
 
 def test_persist_detection_result_creates_incident(db_session: Session) -> None:
-    service = IncidentHistoryService(db_session, settings=test_settings())
+    service = IncidentHistoryService(db_session, settings=make_test_settings())
 
     response = service.persist_detection_result(detection_response())
 
@@ -47,7 +47,7 @@ def test_persist_detection_result_creates_incident(db_session: Session) -> None:
 
 
 def test_persist_detection_result_updates_active_incident(db_session: Session) -> None:
-    service = IncidentHistoryService(db_session, settings=test_settings())
+    service = IncidentHistoryService(db_session, settings=make_test_settings())
 
     first_response = service.persist_detection_result(detection_response())
     second_response = service.persist_detection_result(detection_response())
@@ -69,7 +69,7 @@ def test_persist_detection_result_updates_active_incident(db_session: Session) -
 
 
 def test_update_incident_marks_resolved(db_session: Session) -> None:
-    service = IncidentHistoryService(db_session, settings=test_settings())
+    service = IncidentHistoryService(db_session, settings=make_test_settings())
     response = service.persist_detection_result(detection_response())
 
     updated = service.update_incident(
@@ -106,7 +106,7 @@ def detection_response() -> IncidentDetectionResponse:
     )
 
 
-def test_settings() -> Settings:
+def make_test_settings() -> Settings:
     return Settings(
         monitored_cluster_name="test-cluster",
         secret_key="test-secret",

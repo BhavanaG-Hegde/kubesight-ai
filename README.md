@@ -54,7 +54,7 @@ folder layout.
 
 ## Status
 
-Current phase: frontend unit tests and browser smoke checks.
+Current phase: backend API integration tests.
 
 ## Backend Quickstart
 
@@ -74,6 +74,14 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 alembic upgrade head
 uvicorn app.main:app --reload
+```
+
+Run backend checks:
+
+```bash
+cd backend
+ruff check .
+pytest -q
 ```
 
 Run backend through Docker Compose:

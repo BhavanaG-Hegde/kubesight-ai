@@ -1,13 +1,20 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import JSON, ForeignKey, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.models.cluster import Cluster
+    from app.models.incident import Incident
+    from app.models.pod import Pod
+    from app.models.service import KubernetesService
+    from app.models.workload import Deployment
 
 
 class KubernetesNamespace(UUIDPrimaryKeyMixin, TimestampMixin, Base):

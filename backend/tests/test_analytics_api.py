@@ -1,0 +1,173 @@
+from __future__ import annotations
+
+from datetime import UTC, datetime, timedelta
+
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+
+from app.models.cluster import Cluster
+from app.models.enums import (
+    ClusterStatus,
+    HealthStatus,
+    IncidentSeverity,
+    IncidentStatus,
+    IncidentType,
+    PodPhase,
+)
+from app.models.incident import Incident
+from app.models.metric import ClusterSnapshot
+from app.models.namespace import KubernetesNamespace
+from app.models.pod import Pod
+
+
+def test_analytics_overview_returns_incident_and_resource_summary(
+    client: TestClient,
+    auth_headers: dict[str, str],
+    db_session: Session,
+) -> None:
+    seed_analytics_data(db_session)
+
+    response = client.get(
+        "/api/v1/analytics/overview",
+        headers=auth_headers,
+        params={"days": 7},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["days"] == 7
+    assert payload["total_incidents"] == 3
+    assert payload["open_incidents"] == 1
+    assert payload["critical_incidents"] == 1
+    assert payload["resolved_incidents"] == 1
+    assert sum(point["total"] for point in payload["incident_trends"]) == 3
+    assert payload["resource_trends"][0]["health_score"] == 82
+    assert payload["top_failing_pods"][0]["pod_name"] == "payment-service-9bf"
+    assert payload["top_cpu_pods"][0]["pod_name"] == "checkout-service-77d"
+
+
+def test_analytics_overview_validates_day_window(
+    client: TestClient,
+    auth_headers: dict[str, str],
+) -> None:
+    response = client.get(
+        "/api/v1/analytics/overview",
+        headers=auth_headers,
+        params={"days": 120},
+    )
+
+    assert response.status_code == 422
+
+
+def seed_analytics_data(db_session: Session) -> None:
+    now = datetime.now(UTC)
+    cluster = Cluster(
+        name="test-cluster",
+        status=ClusterStatus.CONNECTED,
+        last_seen_at=now,
+    )
+    namespace = KubernetesNamespace(cluster=cluster, name="payments", labels={})
+    payment_pod = Pod(
+        namespace=namespace,
+        name="payment-service-9bf",
+        phase=PodPhase.RUNNING,
+        health_status=HealthStatus.CRITICAL,
+        health_score=20,
+        restart_count=12,
+        ready_containers=0,
+        total_containers=1,
+        cpu_millicores=80,
+        memory_mebibytes=128,
+        labels={},
+        annotations={},
+        last_seen_at=now,
+    )
+    checkout_pod = Pod(
+        namespace=namespace,
+        name="checkout-service-77d",
+        phase=PodPhase.RUNNING,
+        health_status=HealthStatus.WARNING,
+        health_score=68,
+        restart_count=3,
+        ready_containers=1,
+        total_containers=1,
+        cpu_millicores=420,
+        memory_mebibytes=96,
+        labels={},
+        annotations={},
+        last_seen_at=now,
+    )
+    db_session.add_all(
+        [
+            cluster,
+            namespace,
+            payment_pod,
+            checkout_pod,
+            ClusterSnapshot(
+                cluster=cluster,
+                total_pods=2,
+                running_pods=2,
+                pending_pods=0,
+                failed_pods=0,
+                restart_count=15,
+                cpu_millicores=500,
+                memory_mebibytes=224,
+                health_score=82,
+                sampled_at=now,
+            ),
+            incident(
+                cluster=cluster,
+                namespace=namespace,
+                pod=payment_pod,
+                incident_type=IncidentType.CRASH_LOOP_BACK_OFF,
+                severity=IncidentSeverity.CRITICAL,
+                status=IncidentStatus.OPEN,
+                seen_at=now,
+            ),
+            incident(
+                cluster=cluster,
+                namespace=namespace,
+                pod=payment_pod,
+                incident_type=IncidentType.HIGH_RESTART_COUNT,
+                severity=IncidentSeverity.WARNING,
+                status=IncidentStatus.ACKNOWLEDGED,
+                seen_at=now - timedelta(days=1),
+            ),
+            incident(
+                cluster=cluster,
+                namespace=namespace,
+                pod=checkout_pod,
+                incident_type=IncidentType.TIMEOUT_ERRORS,
+                severity=IncidentSeverity.WARNING,
+                status=IncidentStatus.RESOLVED,
+                seen_at=now - timedelta(days=2),
+            ),
+        ]
+    )
+    db_session.commit()
+
+
+def incident(
+    *,
+    cluster: Cluster,
+    namespace: KubernetesNamespace,
+    pod: Pod,
+    incident_type: IncidentType,
+    severity: IncidentSeverity,
+    status: IncidentStatus,
+    seen_at: datetime,
+) -> Incident:
+    return Incident(
+        cluster=cluster,
+        namespace=namespace,
+        pod=pod,
+        incident_type=incident_type,
+        severity=severity,
+        status=status,
+        title=f"{incident_type.value} detected",
+        summary="Generated by API analytics test.",
+        detection_source="rule_engine",
+        first_seen_at=seen_at,
+        last_seen_at=seen_at,
+        resolved_at=seen_at if status == IncidentStatus.RESOLVED else None,
+    )

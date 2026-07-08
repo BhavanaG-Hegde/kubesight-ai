@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     JSON,
@@ -20,6 +20,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base_class import Base
 from app.models.enums import HealthStatus, PodPhase, enum_values
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.models.ai_analysis import AIAnalysis
+    from app.models.event import PodEvent
+    from app.models.incident import Incident
+    from app.models.log_entry import LogEntry
+    from app.models.metric import PodMetric
+    from app.models.namespace import KubernetesNamespace
 
 
 class Pod(UUIDPrimaryKeyMixin, TimestampMixin, Base):
