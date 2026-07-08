@@ -82,6 +82,14 @@ Run backend through Docker Compose:
 docker compose --profile app up --build
 ```
 
+Run the frontend locally:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 Health check:
 
 ```text
