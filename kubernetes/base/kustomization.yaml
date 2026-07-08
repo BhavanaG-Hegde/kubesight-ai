@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - ../rbac/kubesight-readonly.yaml
+  - configmap.yaml
+  - postgres.yaml
+  - ollama.yaml
+  - backend.yaml
+  - frontend.yaml
+
+commonLabels:
+  app.kubernetes.io/name: kubesight-ai
+  app.kubernetes.io/part-of: kubesight-ai

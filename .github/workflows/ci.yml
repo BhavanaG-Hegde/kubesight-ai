@@ -78,12 +78,32 @@ jobs:
       - name: Production dependency audit
         run: npm audit --omit=dev
 
+  kubernetes:
+    name: Kubernetes Manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.31.0
+
+      - name: Render platform manifests
+        run: kubectl kustomize kubernetes/base
+
+      - name: Render sample workloads
+        run: kubectl kustomize kubernetes/sample-apps
+
   docker:
     name: Docker
     runs-on: ubuntu-latest
     needs:
       - backend
       - frontend
+      - kubernetes
 
     steps:
       - name: Checkout

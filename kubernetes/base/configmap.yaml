@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubesight-config
+  namespace: kubesight
+  labels:
+    app.kubernetes.io/component: config
+data:
+  APP_NAME: "KubeSight AI"
+  APP_ENV: "production"
+  API_V1_PREFIX: "/api/v1"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+  LOG_LEVEL: "INFO"
+  RUN_MIGRATIONS: "true"
+  CORS_ORIGINS: "http://localhost:5173,http://localhost:3000"
+  POSTGRES_USER: "kubesight"
+  POSTGRES_DB: "kubesight"
+  MONITORED_CLUSTER_NAME: "local-kubernetes"
+  OLLAMA_BASE_URL: "http://kubesight-ollama:11434"
+  OLLAMA_MODEL: "llama3.2"
+  OLLAMA_REQUEST_TIMEOUT_SECONDS: "60"

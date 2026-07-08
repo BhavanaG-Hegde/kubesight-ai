@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubesight-samples
+  labels:
+    app.kubernetes.io/name: kubesight-samples
+    app.kubernetes.io/part-of: kubesight-ai

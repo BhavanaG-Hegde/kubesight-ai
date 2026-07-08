@@ -57,6 +57,54 @@ kubectl create namespace kubesight
 kubectl apply -f kubernetes/rbac/kubesight-readonly.yaml
 ```
 
+## Deployment Manifests
+
+The deployable Kubernetes platform lives in:
+
+```text
+kubernetes/base
+```
+
+It includes:
+
+- `kubesight` namespace
+- Backend deployment and service
+- Frontend deployment and service
+- Postgres StatefulSet and service
+- Ollama StatefulSet and service
+- Read-only backend RBAC
+
+Secrets are not committed. Create `kubesight-secrets` before applying the base
+manifests:
+
+```bash
+kubectl apply -f kubernetes/base/namespace.yaml
+kubectl -n kubesight create secret generic kubesight-secrets \
+  --from-literal=SECRET_KEY="$(openssl rand -hex 32)" \
+  --from-literal=POSTGRES_PASSWORD="replace-this-password" \
+  --from-literal=DATABASE_URL="postgresql+psycopg://kubesight:replace-this-password@kubesight-postgres:5432/kubesight"
+kubectl apply -k kubernetes/base
+```
+
+The full deployment runbook is in [kubernetes/README.md](../kubernetes/README.md).
+
+## Demo Workloads
+
+The `kubernetes/sample-apps` package creates intentionally unhealthy workloads
+for local demos:
+
+- CrashLoopBackOff
+- OOMKilled
+- ImagePullBackOff
+- Timeout and database error logs
+- High CPU usage
+
+Apply them with:
+
+```bash
+kubectl apply -k kubernetes/sample-apps
+```
+
 ## Local Checklist
 
 1. Start Minikube or Kind.
@@ -69,3 +117,4 @@ kubectl get namespaces
 3. Set `KUBECONFIG_PATH` or rely on the default kubeconfig.
 4. Register and log in through the auth API.
 5. Call `GET /api/v1/kubernetes/namespaces` with the bearer token.
+6. Apply `kubernetes/sample-apps` to generate realistic incident signals.

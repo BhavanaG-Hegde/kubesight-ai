@@ -54,7 +54,7 @@ folder layout.
 
 ## Status
 
-Current phase: frontend foundation with CI/CD validation.
+Current phase: Kubernetes deployment manifests and demo incident workloads.
 
 ## Backend Quickstart
 
@@ -88,6 +88,18 @@ Run the frontend locally:
 cd frontend
 npm install
 npm run dev
+```
+
+Run on Kubernetes:
+
+```bash
+kubectl apply -f kubernetes/base/namespace.yaml
+kubectl -n kubesight create secret generic kubesight-secrets \
+  --from-literal=SECRET_KEY="$(openssl rand -hex 32)" \
+  --from-literal=POSTGRES_PASSWORD="replace-this-password" \
+  --from-literal=DATABASE_URL="postgresql+psycopg://kubesight:replace-this-password@kubesight-postgres:5432/kubesight"
+kubectl apply -k kubernetes/base
+kubectl apply -k kubernetes/sample-apps
 ```
 
 Health check:
@@ -153,3 +165,4 @@ POST http://localhost:8000/api/v1/ai/ask
 - [Incident history](docs/incident-history.md)
 - [AI assistant](docs/ai-assistant.md)
 - [CI/CD](docs/ci-cd.md)
+- [Kubernetes deployment](kubernetes/README.md)

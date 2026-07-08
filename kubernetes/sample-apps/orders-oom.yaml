@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-service
+  namespace: kubesight-samples
+  labels:
+    app.kubernetes.io/name: orders-service
+    app.kubernetes.io/component: sample-oom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: orders-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: orders-service
+        app.kubernetes.io/component: sample-oom
+    spec:
+      containers:
+        - name: orders-service
+          image: python:3.12-alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo "$(date -Iseconds) INFO orders-service warming cache";
+              python - <<'PY'
+              chunks = []
+              while True:
+                  chunks.append("x" * 1024 * 1024)
+              PY
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 96Mi

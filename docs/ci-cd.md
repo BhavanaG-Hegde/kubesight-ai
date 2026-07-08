@@ -5,7 +5,7 @@ validated before it becomes part of the portfolio history.
 
 ## Pipeline
 
-The CI workflow runs three jobs:
+The CI workflow runs four jobs:
 
 1. Backend
    - Installs the FastAPI package with development dependencies.
@@ -18,13 +18,17 @@ The CI workflow runs three jobs:
    - Builds the Vite production bundle.
    - Audits production dependencies.
 
-3. Docker
+3. Kubernetes Manifests
+   - Renders the platform Kustomize package.
+   - Renders the sample workload Kustomize package.
+
+4. Docker
    - Validates `docker-compose.yml`.
    - Builds the backend image.
    - Builds the frontend image.
 
-The Docker job depends on successful backend and frontend jobs so image builds
-only run after the application checks are green.
+The Docker job depends on successful backend, frontend, and Kubernetes jobs so
+image builds only run after the application and manifest checks are green.
 
 ## Dependency Updates
 
@@ -49,6 +53,11 @@ npm ci
 npm run lint
 npm run build
 npm audit --omit=dev
+```
+
+```bash
+kubectl kustomize kubernetes/base
+kubectl kustomize kubernetes/sample-apps
 ```
 
 ```bash

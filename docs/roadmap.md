@@ -44,6 +44,8 @@
 ## Phase 8: Analytics And Production Polish
 
 - Add charts and trend analysis.
-- Add Dockerfiles and Docker Compose.
-- Add GitHub Actions.
+- Add Dockerfiles and Docker Compose. Done.
+- Add GitHub Actions. Done.
+- Add Kubernetes deployment manifests. Done.
+- Add intentionally unhealthy sample workloads. Done.
 - Complete documentation.
