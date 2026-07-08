@@ -54,4 +54,26 @@ folder layout.
 
 ## Status
 
-Current phase: project scaffold and architecture planning.
+Current phase: backend foundation and database schema.
+
+## Backend Quickstart
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+uvicorn app.main:app --reload
+```
+
+Health check:
+
+```text
+GET http://localhost:8000/api/v1/health
+```
+
+## Architecture Docs
+
+- [Folder structure](docs/folder-structure.md)
+- [Backend architecture](docs/backend-architecture.md)
+- [Database schema](docs/database-schema.md)

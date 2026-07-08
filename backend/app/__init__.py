@@ -1,0 +1,1 @@
+"""KubeSight AI backend application."""
