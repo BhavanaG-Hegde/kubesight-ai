@@ -2,10 +2,12 @@ import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import MemoryOutlinedIcon from "@mui/icons-material/MemoryOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 import SpeedOutlinedIcon from "@mui/icons-material/SpeedOutlined";
+import SyncOutlinedIcon from "@mui/icons-material/SyncOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import {
   Alert,
   Box,
+  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -16,7 +18,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import {
@@ -36,11 +38,13 @@ import {
 } from "recharts";
 
 import { getAnalyticsOverview } from "../api/analytics";
+import { collectMetrics } from "../api/metrics";
 import { EmptyState } from "../components/EmptyState";
 import { MetricCard } from "../components/MetricCard";
 import { PageHeader } from "../components/PageHeader";
 import type {
   DistributionBucket,
+  ClusterResourceTrendPoint,
   IncidentTrendPoint,
   PodResourcePoint,
   TopFailingPod,
@@ -59,10 +63,22 @@ const chartColors = ["#0f766e", "#2563eb", "#d97706", "#dc2626", "#7c3aed", "#08
 
 export function AnalyticsPage() {
   const [days, setDays] = useState(30);
+  const [collectionMessage, setCollectionMessage] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const analyticsQuery = useQuery({
     queryKey: ["analytics-overview", days],
     queryFn: () => getAnalyticsOverview(days),
     refetchInterval: 60_000,
+  });
+  const collectMutation = useMutation({
+    mutationFn: collectMetrics,
+    onSuccess: async (response) => {
+      setCollectionMessage(
+        `Collected ${response.persisted_pod_metrics} pod metric samples from `
+          + `${response.total_pods} pods.`,
+      );
+      await queryClient.invalidateQueries({ queryKey: ["analytics-overview"] });
+    },
   });
 
   const overview = analyticsQuery.data;
@@ -86,28 +102,47 @@ export function AnalyticsPage() {
     () => overview?.top_restarting_pods.map(formatPodResource) ?? [],
     [overview?.top_restarting_pods],
   );
+  const resourceTrendData = useMemo(
+    () => overview?.resource_trends.map(formatResourceTrendPoint) ?? [],
+    [overview?.resource_trends],
+  );
 
   return (
     <Stack spacing={3}>
       <PageHeader
         actions={
-          <FormControl size="small" sx={{ minWidth: 132 }}>
-            <InputLabel id="analytics-window-label">Window</InputLabel>
-            <Select
-              label="Window"
-              labelId="analytics-window-label"
-              onChange={(event) => setDays(Number(event.target.value))}
-              value={days}
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
+            <Button
+              disabled={collectMutation.isPending}
+              onClick={() => collectMutation.mutate()}
+              startIcon={<SyncOutlinedIcon />}
+              variant="contained"
             >
-              <MenuItem value={7}>7 days</MenuItem>
-              <MenuItem value={30}>30 days</MenuItem>
-              <MenuItem value={90}>90 days</MenuItem>
-            </Select>
-          </FormControl>
+              {collectMutation.isPending ? "Collecting" : "Collect"}
+            </Button>
+            <FormControl size="small" sx={{ minWidth: 132 }}>
+              <InputLabel id="analytics-window-label">Window</InputLabel>
+              <Select
+                label="Window"
+                labelId="analytics-window-label"
+                onChange={(event) => setDays(Number(event.target.value))}
+                value={days}
+              >
+                <MenuItem value={7}>7 days</MenuItem>
+                <MenuItem value={30}>30 days</MenuItem>
+                <MenuItem value={90}>90 days</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
         }
         subtitle="Incident history and workload risk patterns"
         title="Analytics"
       />
+
+      {collectionMessage ? <Alert severity="success">{collectionMessage}</Alert> : null}
+      {collectMutation.error ? (
+        <Alert severity="warning">{String(collectMutation.error.message)}</Alert>
+      ) : null}
 
       {analyticsQuery.isLoading ? (
         <Box sx={{ display: "grid", minHeight: 260, placeItems: "center" }}>
@@ -155,7 +190,7 @@ export function AnalyticsPage() {
             sx={{
               display: "grid",
               gap: 2,
-              gridTemplateColumns: { xs: "1fr", xl: "1.4fr 1fr" },
+              gridTemplateColumns: { xs: "1fr", xl: "1.25fr 1fr" },
             }}
           >
             <ChartCard title="Incident Trends">
@@ -182,6 +217,26 @@ export function AnalyticsPage() {
               <DistributionPie data={overview.severity_distribution} />
             </ChartCard>
           </Box>
+
+          <ChartCard title="Resource Trends">
+            {resourceTrendData.length > 0 ? (
+              <ResponsiveContainer height="100%" width="100%">
+                <LineChart data={resourceTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="timeLabel" minTickGap={18} />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Line dataKey="cpu_millicores" dot={false} stroke="#2563eb" strokeWidth={2} />
+                  <Line dataKey="memory_mebibytes" dot={false} stroke="#0f766e" strokeWidth={2} />
+                  <Line dataKey="restart_count" dot={false} stroke="#d97706" strokeWidth={2} />
+                  <Line dataKey="health_score" dot={false} stroke="#16a34a" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState title="Collect metrics to build resource trends." />
+            )}
+          </ChartCard>
 
           <Box
             sx={{
@@ -341,6 +396,19 @@ function formatTrendPoint(point: IncidentTrendPoint) {
   return {
     ...point,
     dateLabel: date.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+  };
+}
+
+function formatResourceTrendPoint(point: ClusterResourceTrendPoint) {
+  const sampledAt = new Date(point.sampled_at);
+  return {
+    ...point,
+    timeLabel: sampledAt.toLocaleString(undefined, {
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      month: "short",
+    }),
   };
 }
 

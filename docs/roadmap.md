@@ -44,6 +44,7 @@
 ## Phase 8: Analytics And Production Polish
 
 - Add charts and trend analysis. Done for persisted incidents and current pod rankings.
+- Persist cluster snapshots and pod metric samples. Done for manual collection runs.
 - Add Dockerfiles and Docker Compose. Done.
 - Add GitHub Actions. Done.
 - Add Kubernetes deployment manifests. Done.

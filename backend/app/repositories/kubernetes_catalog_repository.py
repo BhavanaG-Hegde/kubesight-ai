@@ -63,12 +63,17 @@ class KubernetesCatalogRepository:
         *,
         namespace: KubernetesNamespace,
         name: str,
+        node_name: str | None = None,
         phase: str = PodPhase.UNKNOWN.value,
         health_status: HealthStatus = HealthStatus.UNKNOWN,
         health_score: int = 100,
         restart_count: int = 0,
         ready_containers: int = 0,
         total_containers: int = 0,
+        cpu_millicores: int = 0,
+        memory_mebibytes: int = 0,
+        labels: dict[str, str] | None = None,
+        annotations: dict[str, str] | None = None,
     ) -> Pod:
         pod = self.db.execute(
             select(Pod).where(Pod.namespace_id == namespace.id, Pod.name == name)
@@ -84,11 +89,16 @@ class KubernetesCatalogRepository:
             self.db.add(pod)
 
         pod.phase = self._pod_phase(phase)
+        pod.node_name = node_name
         pod.health_status = health_status
         pod.health_score = health_score
         pod.restart_count = restart_count
         pod.ready_containers = ready_containers
         pod.total_containers = total_containers
+        pod.cpu_millicores = cpu_millicores
+        pod.memory_mebibytes = memory_mebibytes
+        pod.labels = labels or pod.labels or {}
+        pod.annotations = annotations or pod.annotations or {}
         pod.last_seen_at = datetime.now(UTC)
 
         self.db.flush()

@@ -15,6 +15,7 @@ The endpoint requires JWT authentication and accepts a `days` window from `1` to
 ## Included Views
 
 - Incident trends by day.
+- Resource trends from persisted cluster snapshots.
 - Severity distribution.
 - Incident status distribution.
 - Incident type and error distribution.
@@ -27,5 +28,23 @@ The endpoint requires JWT authentication and accepts a `days` window from `1` to
 
 Incident charts are based on persisted rule-based incidents. CPU, memory, and
 restart charts use the latest pod records already stored by the catalog layer.
-Full historical resource charts will become richer once scheduled metric
-collection writes recurring `cluster_snapshots` and `pod_metrics` records.
+Historical resource charts use `cluster_snapshots` written by metric collection.
+
+## Metric Collection
+
+Trigger a collection pass with:
+
+```text
+POST /api/v1/metrics/collect
+```
+
+The collector stores:
+
+- One `cluster_snapshots` row per collection run.
+- One `pod_metrics` row per pod when Metrics Server data is available.
+- Current CPU, memory, restart, health score, and phase values on stored pod
+  catalog records.
+
+If Metrics Server is unavailable, the collector still stores pod state and a
+cluster snapshot with zero CPU/memory totals, and returns a warning explaining
+that Metrics Server is required for resource samples.

@@ -9,9 +9,11 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models.enums import IncidentSeverity, IncidentStatus
 from app.models.incident import Incident
+from app.models.metric import ClusterSnapshot
 from app.models.pod import Pod
 from app.schemas.analytics import (
     AnalyticsOverviewResponse,
+    ClusterResourceTrendPoint,
     DistributionBucket,
     IncidentTrendPoint,
     PodResourcePoint,
@@ -41,6 +43,7 @@ class AnalyticsService:
                 1 for item in incidents if item.status == IncidentStatus.RESOLVED
             ),
             incident_trends=self._incident_trends(incidents=incidents, days=days, now=now),
+            resource_trends=self._resource_trends(since=cutoff),
             severity_distribution=self._distribution(
                 Counter(incident.severity.value for incident in incidents)
             ),
@@ -99,6 +102,25 @@ class AnalyticsService:
                 info=bucket.info,
             )
             for day, bucket in buckets.items()
+        ]
+
+    def _resource_trends(self, *, since: datetime) -> list[ClusterResourceTrendPoint]:
+        statement = (
+            select(ClusterSnapshot)
+            .where(ClusterSnapshot.sampled_at >= since)
+            .order_by(ClusterSnapshot.sampled_at.asc())
+            .limit(500)
+        )
+        snapshots = self.db.execute(statement).scalars().all()
+        return [
+            ClusterResourceTrendPoint(
+                sampled_at=snapshot.sampled_at,
+                cpu_millicores=snapshot.cpu_millicores,
+                memory_mebibytes=snapshot.memory_mebibytes,
+                restart_count=snapshot.restart_count,
+                health_score=snapshot.health_score,
+            )
+            for snapshot in snapshots
         ]
 
     def _distribution(self, counts: Counter[str]) -> list[DistributionBucket]:

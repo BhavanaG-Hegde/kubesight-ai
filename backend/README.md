@@ -68,6 +68,14 @@ GET /api/v1/monitoring/namespaces/{namespace}/incidents/detect
 GET /api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/incidents/detect
 ```
 
+Metrics endpoints:
+
+```text
+POST /api/v1/metrics/collect
+GET  /api/v1/metrics/snapshots
+GET  /api/v1/metrics/pods
+```
+
 Incident history endpoints:
 
 ```text

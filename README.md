@@ -135,6 +135,14 @@ GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/incidents/det
 GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/incidents/detect
 ```
 
+Metrics collection:
+
+```text
+POST http://localhost:8000/api/v1/metrics/collect
+GET  http://localhost:8000/api/v1/metrics/snapshots
+GET  http://localhost:8000/api/v1/metrics/pods
+```
+
 Incident history:
 
 ```text

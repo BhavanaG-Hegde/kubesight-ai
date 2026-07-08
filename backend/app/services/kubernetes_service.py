@@ -21,6 +21,7 @@ from app.schemas.kubernetes import (
     ServicePortRead,
     ServiceRead,
 )
+from app.schemas.metrics import PodResourceMetricRead
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +34,25 @@ class KubernetesService:
         self._ensure_configured()
         self.core_v1 = client.CoreV1Api()
         self.apps_v1 = client.AppsV1Api()
+        self.custom_objects = client.CustomObjectsApi()
 
     def get_cluster_summary(self) -> ClusterSummaryRead:
-        pods = self._request(lambda: self.core_v1.list_pod_for_all_namespaces().items)
+        pods = self.list_all_pods()
         return self._build_cluster_summary(pods)
+
+    def list_all_pods(self) -> list[PodRead]:
+        pods = self._request(lambda: self.core_v1.list_pod_for_all_namespaces().items)
+        return [self._map_pod(pod) for pod in pods]
+
+    def list_pod_resource_metrics(self) -> list[PodResourceMetricRead]:
+        response = self._request(
+            lambda: self.custom_objects.list_cluster_custom_object(
+                group="metrics.k8s.io",
+                version="v1beta1",
+                plural="pods",
+            )
+        )
+        return [self._map_pod_metric(item) for item in response.get("items", [])]
 
     def list_namespaces(self) -> list[NamespaceRead]:
         namespaces = self._request(lambda: self.core_v1.list_namespace().items)
@@ -145,14 +161,12 @@ class KubernetesService:
             )
             raise KubernetesClientError(exc.reason or "Kubernetes API request failed.") from exc
 
-    def _build_cluster_summary(self, pods: list[Any]) -> ClusterSummaryRead:
+    def _build_cluster_summary(self, pods: list[PodRead]) -> ClusterSummaryRead:
         total_pods = len(pods)
-        running_pods = sum(1 for pod in pods if (pod.status.phase or "Unknown") == "Running")
-        pending_pods = sum(1 for pod in pods if (pod.status.phase or "Unknown") == "Pending")
-        failed_pods = sum(1 for pod in pods if (pod.status.phase or "Unknown") == "Failed")
-        restart_count = sum(
-            self._restart_count(pod.status.container_statuses or []) for pod in pods
-        )
+        running_pods = sum(1 for pod in pods if pod.phase == "Running")
+        pending_pods = sum(1 for pod in pods if pod.phase == "Pending")
+        failed_pods = sum(1 for pod in pods if pod.phase == "Failed")
+        restart_count = sum(pod.restart_count for pod in pods)
         return ClusterSummaryRead(
             total_pods=total_pods,
             running_pods=running_pods,
@@ -218,6 +232,23 @@ class KubernetesService:
             created_at=metadata.creation_timestamp,
         )
 
+    def _map_pod_metric(self, item: dict[str, Any]) -> PodResourceMetricRead:
+        metadata = item.get("metadata", {})
+        containers = item.get("containers", [])
+        cpu_millicores = 0
+        memory_mebibytes = 0
+        for container in containers:
+            usage = container.get("usage", {})
+            cpu_millicores += self._cpu_to_millicores(str(usage.get("cpu", "0")))
+            memory_mebibytes += self._memory_to_mebibytes(str(usage.get("memory", "0")))
+
+        return PodResourceMetricRead(
+            namespace=str(metadata.get("namespace", "default")),
+            pod_name=str(metadata.get("name", "unknown")),
+            cpu_millicores=cpu_millicores,
+            memory_mebibytes=memory_mebibytes,
+        )
+
     def _map_container_status(self, container: Any) -> ContainerStatusRead:
         state, reason = self._container_state(container.state)
         return ContainerStatusRead(
@@ -255,3 +286,27 @@ class KubernetesService:
 
     def _metadata_map(self, value: dict[str, str] | None) -> dict[str, str]:
         return dict(value or {})
+
+    def _cpu_to_millicores(self, value: str) -> int:
+        if value.endswith("n"):
+            return round(int(value[:-1]) / 1_000_000)
+        if value.endswith("u"):
+            return round(int(value[:-1]) / 1_000)
+        if value.endswith("m"):
+            return int(value[:-1])
+        return round(float(value) * 1000)
+
+    def _memory_to_mebibytes(self, value: str) -> int:
+        units = {
+            "Ki": 1 / 1024,
+            "Mi": 1,
+            "Gi": 1024,
+            "Ti": 1024 * 1024,
+            "K": 1000 / 1024 / 1024,
+            "M": 1000 * 1000 / 1024 / 1024,
+            "G": 1000 * 1000 * 1000 / 1024 / 1024,
+        }
+        for suffix, multiplier in units.items():
+            if value.endswith(suffix):
+                return round(float(value[: -len(suffix)]) * multiplier)
+        return round(float(value) / 1024 / 1024)

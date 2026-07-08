@@ -13,6 +13,14 @@ class IncidentTrendPoint(BaseModel):
     info: int = 0
 
 
+class ClusterResourceTrendPoint(BaseModel):
+    sampled_at: datetime
+    cpu_millicores: int
+    memory_mebibytes: int
+    restart_count: int
+    health_score: int
+
+
 class DistributionBucket(BaseModel):
     label: str
     value: int
@@ -43,6 +51,7 @@ class AnalyticsOverviewResponse(BaseModel):
     critical_incidents: int
     resolved_incidents: int
     incident_trends: list[IncidentTrendPoint] = Field(default_factory=list)
+    resource_trends: list[ClusterResourceTrendPoint] = Field(default_factory=list)
     severity_distribution: list[DistributionBucket] = Field(default_factory=list)
     status_distribution: list[DistributionBucket] = Field(default_factory=list)
     incident_type_distribution: list[DistributionBucket] = Field(default_factory=list)

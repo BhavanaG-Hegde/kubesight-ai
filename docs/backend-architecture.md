@@ -31,6 +31,7 @@ API routes
 - `AuthService`: registration, login, password hashing, JWT issuing.
 - `KubernetesService`: namespaces, deployments, pods, services, events, logs.
 - `MetricsService`: cluster and pod resource collection.
+- `MetricsCollectionService`: one-shot collection into snapshots and pod metrics.
 - `HealthScoringService`: pod and cluster health scores.
 - `IncidentDetectionService`: rule-based incident detection.
 - `MonitoringService`: orchestration for live health assessment and detection.

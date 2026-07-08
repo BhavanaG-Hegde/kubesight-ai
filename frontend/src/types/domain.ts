@@ -177,6 +177,14 @@ export interface IncidentTrendPoint {
   info: number;
 }
 
+export interface ClusterResourceTrendPoint {
+  sampled_at: string;
+  cpu_millicores: number;
+  memory_mebibytes: number;
+  restart_count: number;
+  health_score: number;
+}
+
 export interface DistributionBucket {
   label: string;
   value: number;
@@ -207,6 +215,7 @@ export interface AnalyticsOverviewResponse {
   critical_incidents: number;
   resolved_incidents: number;
   incident_trends: IncidentTrendPoint[];
+  resource_trends: ClusterResourceTrendPoint[];
   severity_distribution: DistributionBucket[];
   status_distribution: DistributionBucket[];
   incident_type_distribution: DistributionBucket[];
@@ -214,4 +223,21 @@ export interface AnalyticsOverviewResponse {
   top_cpu_pods: PodResourcePoint[];
   top_memory_pods: PodResourcePoint[];
   top_restarting_pods: PodResourcePoint[];
+}
+
+export interface MetricsCollectionResponse {
+  cluster_name: string;
+  sampled_at: string;
+  metrics_api_available: boolean;
+  total_pods: number;
+  running_pods: number;
+  pending_pods: number;
+  failed_pods: number;
+  restart_count: number;
+  cpu_millicores: number;
+  memory_mebibytes: number;
+  health_score: number;
+  persisted_pod_metrics: number;
+  pods_without_metrics: number;
+  warnings: string[];
 }
