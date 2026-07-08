@@ -54,7 +54,7 @@ folder layout.
 
 ## Status
 
-Current phase: incident detail workflow and AI-assisted resolution.
+Current phase: frontend unit tests and browser smoke checks.
 
 ## Backend Quickstart
 
@@ -88,6 +88,17 @@ Run the frontend locally:
 cd frontend
 npm install
 npm run dev
+```
+
+Run frontend checks:
+
+```bash
+cd frontend
+npm run lint
+npm run test
+npm run test:e2e
+npm run build
+npm audit --omit=dev
 ```
 
 Run on Kubernetes:

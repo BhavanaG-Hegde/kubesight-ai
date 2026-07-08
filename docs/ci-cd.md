@@ -15,6 +15,9 @@ The CI workflow runs four jobs:
 2. Frontend
    - Installs React dependencies with `npm ci`.
    - Runs ESLint.
+   - Runs Vitest unit and component tests.
+   - Installs Chromium for Playwright.
+   - Runs Playwright smoke tests against the Vite app with mocked APIs.
    - Builds the Vite production bundle.
    - Audits production dependencies.
 
@@ -51,6 +54,9 @@ pytest -q
 cd frontend
 npm ci
 npm run lint
+npm run test
+npx playwright install chromium
+npm run test:e2e
 npm run build
 npm audit --omit=dev
 ```

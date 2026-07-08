@@ -30,6 +30,8 @@ pnpm-debug.log*
 .vite/
 frontend/dist/
 frontend/build/
+frontend/playwright-report/
+frontend/test-results/
 frontend/*.tsbuildinfo
 frontend/vite.config.d.ts
 frontend/vite.config.js
