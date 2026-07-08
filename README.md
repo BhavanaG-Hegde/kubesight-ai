@@ -60,7 +60,7 @@ Current phase: backend foundation and database schema.
 
 ```bash
 cd backend
-python -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 uvicorn app.main:app --reload
@@ -70,6 +70,15 @@ Health check:
 
 ```text
 GET http://localhost:8000/api/v1/health
+```
+
+Authentication:
+
+```text
+POST http://localhost:8000/api/v1/auth/register
+POST http://localhost:8000/api/v1/auth/login
+POST http://localhost:8000/api/v1/auth/token
+GET  http://localhost:8000/api/v1/auth/me
 ```
 
 ## Architecture Docs

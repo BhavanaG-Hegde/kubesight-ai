@@ -7,7 +7,7 @@ log analysis.
 
 ```bash
 cd backend
-python -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 uvicorn app.main:app --reload
@@ -27,4 +27,13 @@ Current endpoint:
 
 ```text
 GET /api/v1/health
+```
+
+Authentication endpoints:
+
+```text
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+POST /api/v1/auth/token
+GET  /api/v1/auth/me
 ```
