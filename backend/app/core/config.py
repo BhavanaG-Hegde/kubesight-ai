@@ -22,6 +22,7 @@ class Settings(BaseSettings):
 
     kubeconfig_path: str | None = None
     kubernetes_context: str | None = None
+    monitored_cluster_name: str = "local-cluster"
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3.2"

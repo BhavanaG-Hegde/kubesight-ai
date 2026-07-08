@@ -67,3 +67,13 @@ GET /api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/health
 GET /api/v1/monitoring/namespaces/{namespace}/incidents/detect
 GET /api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/incidents/detect
 ```
+
+Incident history endpoints:
+
+```text
+GET   /api/v1/incidents
+GET   /api/v1/incidents/{incident_id}
+PATCH /api/v1/incidents/{incident_id}
+POST  /api/v1/incidents/sync/namespaces/{namespace}
+POST  /api/v1/incidents/sync/namespaces/{namespace}/pods/{pod_name}
+```

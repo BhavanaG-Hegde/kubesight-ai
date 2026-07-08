@@ -29,6 +29,10 @@ class KubernetesResourceNotFoundError(KubernetesClientError):
     """Raised when a requested Kubernetes resource does not exist."""
 
 
+class IncidentNotFoundError(KubeSightError):
+    """Raised when an incident history record cannot be found."""
+
+
 class IncidentDetectionError(KubeSightError):
     """Raised when incident detection cannot complete safely."""
 

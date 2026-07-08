@@ -33,9 +33,9 @@ risk.
 
 ## Incident Candidates
 
-The detection engine currently returns incident candidates from live Kubernetes
-state. Persisting these candidates into the `incidents` table is the next backend
-step.
+The detection engine returns incident candidates from live Kubernetes state.
+Incident sync endpoints can persist these candidates into PostgreSQL for history,
+search, and resolution tracking.
 
 Detected incident types:
 
@@ -57,6 +57,13 @@ GET /api/v1/monitoring/namespaces/{namespace}/health
 GET /api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/health
 GET /api/v1/monitoring/namespaces/{namespace}/incidents/detect
 GET /api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/incidents/detect
+```
+
+Persist detected incidents:
+
+```text
+POST /api/v1/incidents/sync/namespaces/{namespace}
+POST /api/v1/incidents/sync/namespaces/{namespace}/pods/{pod_name}
 ```
 
 Query parameters:

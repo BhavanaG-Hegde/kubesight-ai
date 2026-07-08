@@ -178,6 +178,7 @@ Stores detected operational incidents.
 - `summary`
 - `root_cause`
 - `recommendation`
+- `resolution`
 - `detection_source`
 - `first_seen_at`
 - `last_seen_at`

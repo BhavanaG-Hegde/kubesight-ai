@@ -115,6 +115,16 @@ GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/incidents/det
 GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/incidents/detect
 ```
 
+Incident history:
+
+```text
+GET   http://localhost:8000/api/v1/incidents
+GET   http://localhost:8000/api/v1/incidents/{incident_id}
+PATCH http://localhost:8000/api/v1/incidents/{incident_id}
+POST  http://localhost:8000/api/v1/incidents/sync/namespaces/{namespace}
+POST  http://localhost:8000/api/v1/incidents/sync/namespaces/{namespace}/pods/{pod_name}
+```
+
 ## Architecture Docs
 
 - [Folder structure](docs/folder-structure.md)
@@ -122,3 +132,4 @@ GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/pods/{pod_nam
 - [Database schema](docs/database-schema.md)
 - [Kubernetes integration](docs/kubernetes-integration.md)
 - [Health scoring and incident detection](docs/monitoring-rules.md)
+- [Incident history](docs/incident-history.md)

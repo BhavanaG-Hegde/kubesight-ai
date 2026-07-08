@@ -31,6 +31,7 @@ services:
       SECRET_KEY: ${SECRET_KEY:-change-me}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-kubesight}:${POSTGRES_PASSWORD:-kubesight}@postgres:5432/${POSTGRES_DB:-kubesight}
+      MONITORED_CLUSTER_NAME: ${MONITORED_CLUSTER_NAME:-local-cluster}
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
     ports:
