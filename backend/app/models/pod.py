@@ -4,11 +4,21 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, Enum, ForeignKey, Integer, String, Text, UniqueConstraint, Uuid
+from sqlalchemy import (
+    JSON,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    Uuid,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
-from app.models.enums import HealthStatus, PodPhase
+from app.models.enums import HealthStatus, PodPhase, enum_values
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 
@@ -26,13 +36,13 @@ class Pod(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
     node_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     phase: Mapped[PodPhase] = mapped_column(
-        Enum(PodPhase, name="pod_phase"),
+        Enum(PodPhase, name="pod_phase", values_callable=enum_values),
         default=PodPhase.UNKNOWN,
         index=True,
         nullable=False,
     )
     health_status: Mapped[HealthStatus] = mapped_column(
-        Enum(HealthStatus, name="health_status"),
+        Enum(HealthStatus, name="health_status", values_callable=enum_values),
         default=HealthStatus.UNKNOWN,
         index=True,
         nullable=False,

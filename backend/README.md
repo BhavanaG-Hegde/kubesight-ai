@@ -5,11 +5,19 @@ log analysis.
 
 ## Local Development
 
+Start PostgreSQL from the repository root:
+
+```bash
+cp .env.example .env
+docker compose up -d postgres
+```
+
 ```bash
 cd backend
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 

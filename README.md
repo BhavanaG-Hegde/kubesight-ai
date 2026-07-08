@@ -58,12 +58,28 @@ Current phase: backend foundation and database schema.
 
 ## Backend Quickstart
 
+Start PostgreSQL:
+
+```bash
+cp .env.example .env
+docker compose up -d postgres
+```
+
+Run the backend locally:
+
 ```bash
 cd backend
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+alembic upgrade head
 uvicorn app.main:app --reload
+```
+
+Run backend through Docker Compose:
+
+```bash
+docker compose --profile app up --build
 ```
 
 Health check:

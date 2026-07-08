@@ -6,7 +6,7 @@ from sqlalchemy import DateTime, Enum, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
-from app.models.enums import ClusterStatus
+from app.models.enums import ClusterStatus, enum_values
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 
@@ -17,7 +17,7 @@ class Cluster(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     context_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     api_server: Mapped[str | None] = mapped_column(String(500), nullable=True)
     status: Mapped[ClusterStatus] = mapped_column(
-        Enum(ClusterStatus, name="cluster_status"),
+        Enum(ClusterStatus, name="cluster_status", values_callable=enum_values),
         default=ClusterStatus.DISCONNECTED,
         nullable=False,
     )

@@ -62,3 +62,7 @@ class IncidentType(StrEnum):
     DATABASE_CONNECTION_FAILURE = "database_connection_failure"
     ERROR_LOG_SPIKE = "error_log_spike"
     POD_NOT_READY = "pod_not_ready"
+
+
+def enum_values(enum_cls: type[StrEnum]) -> list[str]:
+    return [member.value for member in enum_cls]

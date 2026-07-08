@@ -7,7 +7,7 @@ from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
-from app.models.enums import IncidentSeverity, IncidentStatus, IncidentType
+from app.models.enums import IncidentSeverity, IncidentStatus, IncidentType, enum_values
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 
@@ -32,17 +32,17 @@ class Incident(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=True,
     )
     incident_type: Mapped[IncidentType] = mapped_column(
-        Enum(IncidentType, name="incident_type"),
+        Enum(IncidentType, name="incident_type", values_callable=enum_values),
         index=True,
         nullable=False,
     )
     severity: Mapped[IncidentSeverity] = mapped_column(
-        Enum(IncidentSeverity, name="incident_severity"),
+        Enum(IncidentSeverity, name="incident_severity", values_callable=enum_values),
         index=True,
         nullable=False,
     )
     status: Mapped[IncidentStatus] = mapped_column(
-        Enum(IncidentStatus, name="incident_status"),
+        Enum(IncidentStatus, name="incident_status", values_callable=enum_values),
         default=IncidentStatus.OPEN,
         index=True,
         nullable=False,
