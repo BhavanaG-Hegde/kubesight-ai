@@ -33,6 +33,7 @@ API routes
 - `MetricsService`: cluster and pod resource collection.
 - `HealthScoringService`: pod and cluster health scores.
 - `IncidentDetectionService`: rule-based incident detection.
+- `MonitoringService`: orchestration for live health assessment and detection.
 - `AIAnalysisService`: Ollama-backed explanations and troubleshooting steps.
 - `AnalyticsService`: dashboard aggregates and chart-ready series.
 

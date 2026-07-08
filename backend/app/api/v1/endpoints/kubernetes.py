@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Annotated, NoReturn
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query
 
 from app.api.deps import get_current_user
-from app.core.exceptions import KubernetesClientError, KubernetesResourceNotFoundError
+from app.api.kubernetes_deps import get_kubernetes_service, raise_kubernetes_http_error
+from app.core.exceptions import KubernetesClientError
 from app.schemas.kubernetes import (
     ClusterSummaryRead,
     DeploymentRead,
@@ -21,25 +22,6 @@ router = APIRouter(
     prefix="/kubernetes",
     dependencies=[Depends(get_current_user)],
 )
-
-
-def get_kubernetes_service() -> KubernetesService:
-    try:
-        return KubernetesService()
-    except KubernetesClientError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc),
-        ) from exc
-
-
-def raise_kubernetes_http_error(exc: KubernetesClientError) -> NoReturn:
-    if isinstance(exc, KubernetesResourceNotFoundError):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-    raise HTTPException(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        detail=str(exc),
-    ) from exc
 
 
 @router.get("/summary", response_model=ClusterSummaryRead)

@@ -58,3 +58,12 @@ GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}
 GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/events
 GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs
 ```
+
+Monitoring endpoints:
+
+```text
+GET /api/v1/monitoring/namespaces/{namespace}/health
+GET /api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/health
+GET /api/v1/monitoring/namespaces/{namespace}/incidents/detect
+GET /api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/incidents/detect
+```

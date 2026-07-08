@@ -31,8 +31,8 @@
 
 ## Phase 6: Monitoring And Incident Detection
 
-- Implement pod health scoring.
-- Detect known failure patterns.
+- Implement pod health scoring. Done for live Kubernetes pod state, events, and logs.
+- Detect known failure patterns. Done as incident candidates.
 - Store incidents and expose incident history APIs.
 
 ## Phase 7: AI Assistant

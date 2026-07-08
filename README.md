@@ -106,9 +106,19 @@ GET http://localhost:8000/api/v1/kubernetes/namespaces/{namespace}/pods
 GET http://localhost:8000/api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs
 ```
 
+Monitoring and incident detection:
+
+```text
+GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/health
+GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/health
+GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/incidents/detect
+GET http://localhost:8000/api/v1/monitoring/namespaces/{namespace}/pods/{pod_name}/incidents/detect
+```
+
 ## Architecture Docs
 
 - [Folder structure](docs/folder-structure.md)
 - [Backend architecture](docs/backend-architecture.md)
 - [Database schema](docs/database-schema.md)
 - [Kubernetes integration](docs/kubernetes-integration.md)
+- [Health scoring and incident detection](docs/monitoring-rules.md)
