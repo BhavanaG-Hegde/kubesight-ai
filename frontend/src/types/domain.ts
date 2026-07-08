@@ -169,6 +169,10 @@ export interface AIAnalysisRead {
   created_at: string;
 }
 
+export interface AIAnalysisListResponse {
+  items: AIAnalysisRead[];
+}
+
 export interface IncidentTrendPoint {
   date: string;
   total: number;

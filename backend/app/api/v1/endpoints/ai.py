@@ -37,11 +37,16 @@ def get_ai_service(db: Annotated[Session, Depends(get_db)]) -> AIAssistantServic
 @router.get("/analyses", response_model=AIAnalysisListResponse)
 def list_recent_analyses(
     service: Annotated[AIAssistantService, Depends(get_ai_service)],
+    incident_id: UUID | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
 ) -> AIAnalysisListResponse:
     return AIAnalysisListResponse(
-        items=service.list_recent_analyses(limit=limit, offset=offset)
+        items=service.list_recent_analyses(
+            incident_id=incident_id,
+            limit=limit,
+            offset=offset,
+        )
     )
 
 

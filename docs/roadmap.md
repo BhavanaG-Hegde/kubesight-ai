@@ -35,6 +35,7 @@
 - Implement pod health scoring. Done for live Kubernetes pod state, events, and logs.
 - Detect known failure patterns. Done as incident candidates.
 - Store incidents and expose incident history APIs. Done for rule-based detection sync.
+- Add incident detail and resolution workflow. Done.
 
 ## Phase 7: AI Assistant
 

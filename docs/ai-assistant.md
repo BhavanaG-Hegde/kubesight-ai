@@ -35,6 +35,7 @@ All AI endpoints require JWT authentication.
 
 ```text
 GET  /api/v1/ai/analyses
+GET  /api/v1/ai/analyses?incident_id={incident_id}
 GET  /api/v1/ai/analyses/{analysis_id}
 POST /api/v1/ai/pods/logs/analyze
 POST /api/v1/ai/incidents/{incident_id}/analyze
@@ -60,3 +61,6 @@ Generated responses are stored in `ai_analyses` with optional links to:
 
 This makes AI output searchable and reviewable later instead of being a
 throwaway chat response.
+
+The incident detail page uses the `incident_id` filter to show previous AI
+analyses for the active incident.

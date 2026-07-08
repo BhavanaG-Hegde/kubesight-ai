@@ -98,6 +98,7 @@ AI assistant endpoints:
 
 ```text
 GET  /api/v1/ai/analyses
+GET  /api/v1/ai/analyses?incident_id={incident_id}
 GET  /api/v1/ai/analyses/{analysis_id}
 POST /api/v1/ai/pods/logs/analyze
 POST /api/v1/ai/incidents/{incident_id}/analyze

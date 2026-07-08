@@ -54,7 +54,7 @@ folder layout.
 
 ## Status
 
-Current phase: analytics dashboard and chart-ready backend aggregates.
+Current phase: incident detail workflow and AI-assisted resolution.
 
 ## Backend Quickstart
 
@@ -158,6 +158,7 @@ AI assistant:
 
 ```text
 GET  http://localhost:8000/api/v1/ai/analyses
+GET  http://localhost:8000/api/v1/ai/analyses?incident_id={incident_id}
 GET  http://localhost:8000/api/v1/ai/analyses/{analysis_id}
 POST http://localhost:8000/api/v1/ai/pods/logs/analyze
 POST http://localhost:8000/api/v1/ai/incidents/{incident_id}/analyze

@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
 import { analyzeIncident } from "../api/ai";
 import { getIncidents, syncNamespaceIncidents, updateIncidentStatus } from "../api/incidents";
@@ -151,7 +152,14 @@ export function IncidentsPage() {
                   {incidents.map((incident) => (
                     <TableRow hover key={incident.id}>
                       <TableCell>
-                        <Typography fontWeight={700}>{incident.title}</Typography>
+                        <Typography
+                          component={RouterLink}
+                          fontWeight={700}
+                          sx={{ color: "primary.main", textDecoration: "none" }}
+                          to={`/incidents/${incident.id}`}
+                        >
+                          {incident.title}
+                        </Typography>
                         <Typography color="text.secondary" variant="caption">
                           {titleCase(incident.incident_type)}
                         </Typography>

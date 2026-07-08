@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import type { AIAnalysisRead } from "../types/domain";
+import type { AIAnalysisListResponse, AIAnalysisRead } from "../types/domain";
 
 export interface AskAIPayload {
   question: string;
@@ -14,6 +14,14 @@ export function askAI(payload: AskAIPayload): Promise<AIAnalysisRead> {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export function getAIAnalyses(incidentId?: string): Promise<AIAnalysisListResponse> {
+  const params = new URLSearchParams({ limit: "20" });
+  if (incidentId) {
+    params.set("incident_id", incidentId);
+  }
+  return apiRequest<AIAnalysisListResponse>(`/api/v1/ai/analyses?${params.toString()}`);
 }
 
 export function analyzeIncident(incidentId: string): Promise<AIAnalysisRead> {

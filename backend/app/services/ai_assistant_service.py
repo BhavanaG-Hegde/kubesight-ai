@@ -44,10 +44,20 @@ class AIAssistantService:
             raise AIAnalysisNotFoundError("AI analysis not found.")
         return self.to_read_model(analysis)
 
-    def list_recent_analyses(self, *, limit: int, offset: int) -> list[AIAnalysisRead]:
+    def list_recent_analyses(
+        self,
+        *,
+        incident_id: UUID | None,
+        limit: int,
+        offset: int,
+    ) -> list[AIAnalysisRead]:
         return [
             self.to_read_model(analysis)
-            for analysis in self.analyses.list_recent(limit=limit, offset=offset)
+            for analysis in self.analyses.list_recent(
+                incident_id=incident_id,
+                limit=limit,
+                offset=offset,
+            )
         ]
 
     def analyze_pod_logs(self, payload: PodLogAnalysisRequest) -> AIAnalysisRead:

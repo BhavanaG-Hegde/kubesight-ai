@@ -5,6 +5,7 @@ import { AIAssistantPage } from "../pages/AIAssistantPage";
 import { AnalyticsPage } from "../pages/AnalyticsPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { IncidentsPage } from "../pages/IncidentsPage";
+import { IncidentDetailPage } from "../pages/IncidentDetailPage";
 import { LoginPage } from "../pages/LoginPage";
 import { NamespacesPage } from "../pages/NamespacesPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
@@ -23,6 +24,7 @@ export function AppRoutes() {
           <Route path="/namespaces" element={<NamespacesPage />} />
           <Route path="/namespaces/:namespace/pods/:podName" element={<PodDetailPage />} />
           <Route path="/incidents" element={<IncidentsPage />} />
+          <Route path="/incidents/:incidentId" element={<IncidentDetailPage />} />
           <Route path="/ai" element={<AIAssistantPage />} />
         </Route>
       </Route>

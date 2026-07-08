@@ -21,14 +21,32 @@ export function getIncidents(filters: IncidentFilters = {}): Promise<IncidentLis
   return apiRequest<IncidentListResponse>(`/api/v1/incidents?${params.toString()}`);
 }
 
+export interface IncidentUpdatePayload {
+  status?: IncidentStatus;
+  root_cause?: string;
+  recommendation?: string;
+  resolution?: string;
+}
+
+export function getIncident(incidentId: string): Promise<IncidentRead> {
+  return apiRequest<IncidentRead>(`/api/v1/incidents/${incidentId}`);
+}
+
+export function updateIncident(
+  incidentId: string,
+  payload: IncidentUpdatePayload,
+): Promise<IncidentRead> {
+  return apiRequest<IncidentRead>(`/api/v1/incidents/${incidentId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function updateIncidentStatus(
   incidentId: string,
   status: IncidentStatus,
 ): Promise<IncidentRead> {
-  return apiRequest<IncidentRead>(`/api/v1/incidents/${incidentId}`, {
-    method: "PATCH",
-    body: JSON.stringify({ status }),
-  });
+  return updateIncident(incidentId, { status });
 }
 
 export function syncNamespaceIncidents(namespace: string): Promise<unknown> {

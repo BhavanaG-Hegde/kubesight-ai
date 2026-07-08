@@ -46,3 +46,22 @@ Use `PATCH /api/v1/incidents/{incident_id}` to update:
 
 When `status` is set to `resolved`, the backend automatically sets
 `resolved_at`.
+
+## Frontend Workflow
+
+The incident list links each incident title to a detail page at:
+
+```text
+/incidents/{incident_id}
+```
+
+The detail page supports:
+
+- Reviewing severity, status, type, source, first seen, last seen, and resolved
+  timestamps.
+- Opening the affected pod when namespace and pod context are available.
+- Editing root cause, recommendation, resolution, and status.
+- Resolving the incident from the detail page.
+- Running AI analysis against the incident.
+- Asking follow-up AI questions with the incident as context.
+- Reviewing previous AI analyses saved for the incident.
