@@ -28,6 +28,16 @@ class Settings(BaseSettings):
     ollama_model: str = "llama3.2"
     ollama_request_timeout_seconds: int = 60
 
+    background_worker_enabled: bool = False
+    metrics_collection_interval_seconds: int = Field(default=60, ge=10)
+    incident_scan_interval_seconds: int = Field(default=120, ge=10)
+    incident_scan_namespaces: list[str] = Field(default_factory=list)
+    incident_scan_excluded_namespaces: list[str] = Field(
+        default_factory=lambda: ["kube-system", "kube-public", "kube-node-lease", "kubesight"],
+    )
+    incident_scan_include_logs: bool = True
+    incident_scan_tail_lines: int = Field(default=200, ge=1, le=1000)
+
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
     model_config = SettingsConfigDict(
@@ -42,6 +52,13 @@ class Settings(BaseSettings):
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
+
+    @field_validator("incident_scan_namespaces", "incident_scan_excluded_namespaces", mode="before")
+    @classmethod
+    def parse_namespace_list(cls, value: str | list[str]) -> list[str]:
+        if isinstance(value, str):
+            return [namespace.strip() for namespace in value.split(",") if namespace.strip()]
         return value
 
 

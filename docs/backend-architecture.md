@@ -24,7 +24,7 @@ API routes
   details once repository classes are introduced.
 - `models`: SQLAlchemy ORM entities.
 - `core`: settings, logging, security, exceptions, and shared infrastructure.
-- `workers`: scheduled or background jobs for metric collection and incident scans.
+- `workers`: lifespan-managed jobs for metric collection and incident scans.
 
 ## Planned Services
 
@@ -37,6 +37,7 @@ API routes
 - `MonitoringService`: orchestration for live health assessment and detection.
 - `AIAssistantService`: Ollama-backed explanations and troubleshooting steps.
 - `AnalyticsService`: incident trends, distributions, and pod resource rankings.
+- `BackgroundWorker`: scheduled metrics collection and incident scan loops.
 
 ## API Principles
 

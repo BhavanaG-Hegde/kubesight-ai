@@ -23,6 +23,13 @@ uvicorn app.main:app --reload
 
 The API will be available at `http://localhost:8000`.
 
+Enable background automation when the backend can reach Kubernetes:
+
+```bash
+export BACKGROUND_WORKER_ENABLED=true
+export INCIDENT_SCAN_NAMESPACES=kubesight-samples
+```
+
 ## API Prefix
 
 Versioned APIs live under:

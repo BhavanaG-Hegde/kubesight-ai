@@ -45,6 +45,7 @@
 
 - Add charts and trend analysis. Done for persisted incidents and current pod rankings.
 - Persist cluster snapshots and pod metric samples. Done for manual collection runs.
+- Add scheduled background collection and incident scans. Done.
 - Add Dockerfiles and Docker Compose. Done.
 - Add GitHub Actions. Done.
 - Add Kubernetes deployment manifests. Done.

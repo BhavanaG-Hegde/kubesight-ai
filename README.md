@@ -179,5 +179,6 @@ GET http://localhost:8000/api/v1/analytics/overview?days=30
 - [Incident history](docs/incident-history.md)
 - [AI assistant](docs/ai-assistant.md)
 - [Analytics](docs/analytics.md)
+- [Background worker](docs/background-worker.md)
 - [CI/CD](docs/ci-cd.md)
 - [Kubernetes deployment](kubernetes/README.md)
