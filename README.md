@@ -124,6 +124,7 @@ GET http://localhost:8000/api/v1/kubernetes/summary
 GET http://localhost:8000/api/v1/kubernetes/namespaces
 GET http://localhost:8000/api/v1/kubernetes/namespaces/{namespace}/pods
 GET http://localhost:8000/api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs
+GET http://localhost:8000/api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs/stream
 ```
 
 Monitoring and incident detection:
@@ -175,6 +176,7 @@ GET http://localhost:8000/api/v1/analytics/overview?days=30
 - [Backend architecture](docs/backend-architecture.md)
 - [Database schema](docs/database-schema.md)
 - [Kubernetes integration](docs/kubernetes-integration.md)
+- [Live logs](docs/live-logs.md)
 - [Health scoring and incident detection](docs/monitoring-rules.md)
 - [Incident history](docs/incident-history.md)
 - [AI assistant](docs/ai-assistant.md)

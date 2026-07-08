@@ -1,5 +1,8 @@
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import StopOutlinedIcon from "@mui/icons-material/StopOutlined";
 import {
   Alert,
   Box,
@@ -21,10 +24,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { getPod, getPodEvents, getPodHealth, getPodLogs } from "../api/kubernetes";
+import { getPod, getPodEvents, getPodHealth, getPodLogs, streamPodLogs } from "../api/kubernetes";
 import { PageHeader } from "../components/PageHeader";
 import { StatusChip } from "../components/StatusChip";
 import { formatDateTime, titleCase } from "../utils/format";
@@ -35,6 +38,13 @@ export function PodDetailPage() {
   const { namespace = "", podName = "" } = useParams();
   const [search, setSearch] = useState("");
   const [severity, setSeverity] = useState("all");
+  const [fromTimestamp, setFromTimestamp] = useState("");
+  const [toTimestamp, setToTimestamp] = useState("");
+  const [liveLogs, setLiveLogs] = useState<string[]>([]);
+  const [streamError, setStreamError] = useState<string | null>(null);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const streamControllerRef = useRef<AbortController | null>(null);
+  const logViewportRef = useRef<HTMLElement | null>(null);
 
   const podQuery = useQuery({
     enabled: Boolean(namespace && podName),
@@ -57,15 +67,79 @@ export function PodDetailPage() {
     queryFn: () => getPodLogs(namespace, podName),
   });
 
+  const stopStreaming = useCallback(() => {
+    streamControllerRef.current?.abort();
+    streamControllerRef.current = null;
+    setIsStreaming(false);
+  }, []);
+
+  const startStreaming = useCallback(() => {
+    if (!namespace || !podName || isStreaming) {
+      return;
+    }
+
+    streamControllerRef.current?.abort();
+    const controller = new AbortController();
+    streamControllerRef.current = controller;
+    setLiveLogs([]);
+    setStreamError(null);
+    setIsStreaming(true);
+
+    void streamPodLogs(
+      namespace,
+      podName,
+      { tailLines: 300, timestamps: true },
+      controller.signal,
+      {
+        onLine: (line) => {
+          setLiveLogs((current) => {
+            const next = [...current, line];
+            return next.length > 1000 ? next.slice(next.length - 1000) : next;
+          });
+        },
+        onError: (message) => setStreamError(message),
+      },
+    )
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          setStreamError(error instanceof Error ? error.message : String(error));
+        }
+      })
+      .finally(() => {
+        if (streamControllerRef.current === controller) {
+          streamControllerRef.current = null;
+          setIsStreaming(false);
+        }
+      });
+  }, [isStreaming, namespace, podName]);
+
+  useEffect(() => stopStreaming, [namespace, podName, stopStreaming]);
+
   const filteredLogs = useMemo(() => {
-    const lines = logsQuery.data?.lines ?? [];
-    return lines.filter((line) => {
+    const activeLogLines =
+      liveLogs.length > 0 || isStreaming ? liveLogs : logsQuery.data?.lines ?? [];
+    return activeLogLines.filter((line) => {
       const normalized = line.toLowerCase();
       const matchesSearch = search ? normalized.includes(search.toLowerCase()) : true;
       const matchesSeverity = severity === "all" ? true : normalized.includes(severity);
-      return matchesSearch && matchesSeverity;
+      const matchesTime = matchesTimestampRange(line, fromTimestamp, toTimestamp);
+      return matchesSearch && matchesSeverity && matchesTime;
     });
-  }, [logsQuery.data?.lines, search, severity]);
+  }, [
+    fromTimestamp,
+    isStreaming,
+    liveLogs,
+    logsQuery.data?.lines,
+    search,
+    severity,
+    toTimestamp,
+  ]);
+
+  useEffect(() => {
+    if (isStreaming && logViewportRef.current) {
+      logViewportRef.current.scrollTop = logViewportRef.current.scrollHeight;
+    }
+  }, [filteredLogs.length, isStreaming]);
 
   if (podQuery.isLoading) {
     return <LoadingPanel />;
@@ -220,7 +294,36 @@ export function PodDetailPage() {
               sx={{ justifyContent: "space-between" }}
             >
               <Typography variant="h3">Logs</Typography>
-              <Stack direction="row" spacing={1}>
+              <Stack
+                direction={{ xs: "column", lg: "row" }}
+                spacing={1}
+                sx={{ alignItems: { xs: "stretch", lg: "center" } }}
+              >
+                <Button
+                  disabled={isStreaming}
+                  onClick={startStreaming}
+                  startIcon={<PlayArrowOutlinedIcon />}
+                  variant="contained"
+                >
+                  Stream
+                </Button>
+                <Button
+                  color="error"
+                  disabled={!isStreaming}
+                  onClick={stopStreaming}
+                  startIcon={<StopOutlinedIcon />}
+                  variant="outlined"
+                >
+                  Stop
+                </Button>
+                <Button
+                  disabled={liveLogs.length === 0}
+                  onClick={() => setLiveLogs([])}
+                  startIcon={<DeleteOutlineOutlinedIcon />}
+                  variant="outlined"
+                >
+                  Clear
+                </Button>
                 <TextField
                   InputProps={{
                     startAdornment: (
@@ -246,8 +349,26 @@ export function PodDetailPage() {
                     </MenuItem>
                   ))}
                 </TextField>
+                <TextField
+                  InputLabelProps={{ shrink: true }}
+                  label="From"
+                  onChange={(event) => setFromTimestamp(event.target.value)}
+                  size="small"
+                  type="datetime-local"
+                  value={fromTimestamp}
+                />
+                <TextField
+                  InputLabelProps={{ shrink: true }}
+                  label="To"
+                  onChange={(event) => setToTimestamp(event.target.value)}
+                  size="small"
+                  type="datetime-local"
+                  value={toTimestamp}
+                />
               </Stack>
             </Stack>
+            {isStreaming ? <Alert severity="info">Streaming live logs</Alert> : null}
+            {streamError ? <Alert severity="warning">{streamError}</Alert> : null}
             {logsQuery.isLoading ? (
               <CircularProgress size={28} />
             ) : logsQuery.error ? (
@@ -255,6 +376,7 @@ export function PodDetailPage() {
             ) : (
               <Box
                 component="pre"
+                ref={logViewportRef}
                 sx={{
                   bgcolor: "#111827",
                   borderRadius: 2,
@@ -269,7 +391,9 @@ export function PodDetailPage() {
                   whiteSpace: "pre-wrap",
                 }}
               >
-                {filteredLogs.join("\n")}
+                {filteredLogs.length > 0
+                  ? filteredLogs.join("\n")
+                  : "No logs match the current filters."}
               </Box>
             )}
           </Stack>
@@ -277,6 +401,34 @@ export function PodDetailPage() {
       </Card>
     </Stack>
   );
+}
+
+function matchesTimestampRange(line: string, from: string, to: string): boolean {
+  if (!from && !to) {
+    return true;
+  }
+
+  const lineTimestamp = extractLineTimestamp(line);
+  if (lineTimestamp === null) {
+    return true;
+  }
+
+  if (from && lineTimestamp < new Date(from).getTime()) {
+    return false;
+  }
+  if (to && lineTimestamp > new Date(to).getTime()) {
+    return false;
+  }
+  return true;
+}
+
+function extractLineTimestamp(line: string): number | null {
+  const match = line.match(/^(\d{4}-\d{2}-\d{2}T[^\s]+)/);
+  if (!match) {
+    return null;
+  }
+  const timestamp = Date.parse(match[1]);
+  return Number.isNaN(timestamp) ? null : timestamp;
 }
 
 function LoadingPanel() {

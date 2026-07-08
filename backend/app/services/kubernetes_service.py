@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from typing import Any
 
 from kubernetes import client, config
@@ -120,6 +120,57 @@ class KubernetesService:
             tail_lines=tail_lines,
             lines=log_text.splitlines(),
         )
+
+    def stream_pod_logs(
+        self,
+        namespace: str,
+        pod_name: str,
+        *,
+        container: str | None,
+        tail_lines: int,
+        previous: bool,
+        timestamps: bool,
+    ) -> Iterator[str]:
+        response = self._request(
+            lambda: self.core_v1.read_namespaced_pod_log(
+                name=pod_name,
+                namespace=namespace,
+                container=container,
+                follow=True,
+                tail_lines=tail_lines,
+                previous=previous,
+                timestamps=timestamps,
+                _preload_content=False,
+            )
+        )
+        buffer = ""
+        try:
+            for chunk in response.stream(amt=8192, decode_content=True):
+                if not chunk:
+                    continue
+                buffer += self._decode_log_chunk(chunk)
+                while "\n" in buffer:
+                    line, buffer = buffer.split("\n", 1)
+                    yield line.rstrip("\r")
+            if buffer:
+                yield buffer.rstrip("\r")
+        except ApiException as exc:
+            logger.warning(
+                "Kubernetes log stream failed: status=%s reason=%s",
+                exc.status,
+                exc.reason,
+            )
+            raise KubernetesClientError(
+                exc.reason or "Kubernetes log stream failed."
+            ) from exc
+        except Exception as exc:
+            logger.warning("Kubernetes log stream interrupted: %s", exc)
+            raise KubernetesClientError("Kubernetes log stream interrupted.") from exc
+        finally:
+            if hasattr(response, "close"):
+                response.close()
+            if hasattr(response, "release_conn"):
+                response.release_conn()
 
     def _ensure_configured(self) -> None:
         if KubernetesService._configured:
@@ -286,6 +337,11 @@ class KubernetesService:
 
     def _metadata_map(self, value: dict[str, str] | None) -> dict[str, str]:
         return dict(value or {})
+
+    def _decode_log_chunk(self, chunk: bytes | str) -> str:
+        if isinstance(chunk, bytes):
+            return chunk.decode("utf-8", errors="replace")
+        return chunk
 
     def _cpu_to_millicores(self, value: str) -> int:
         if value.endswith("n"):

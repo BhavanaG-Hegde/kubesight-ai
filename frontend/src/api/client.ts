@@ -22,6 +22,10 @@ export function clearToken(): void {
   window.localStorage.removeItem(TOKEN_STORAGE_KEY);
 }
 
+export function apiUrl(path: string): string {
+  return `${API_BASE_URL}${path}`;
+}
+
 export async function apiRequest<T>(
   path: string,
   options: RequestInit = {},
@@ -37,7 +41,7 @@ export async function apiRequest<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(apiUrl(path), {
     ...options,
     headers,
   });

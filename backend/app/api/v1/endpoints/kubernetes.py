@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import StreamingResponse
 
 from app.api.deps import get_current_user
 from app.api.kubernetes_deps import get_kubernetes_service, raise_kubernetes_http_error
@@ -122,3 +124,42 @@ def get_pod_logs(
         )
     except KubernetesClientError as exc:
         raise_kubernetes_http_error(exc)
+
+
+@router.get("/namespaces/{namespace}/pods/{pod_name}/logs/stream")
+def stream_pod_logs(
+    namespace: str,
+    pod_name: str,
+    service: Annotated[KubernetesService, Depends(get_kubernetes_service)],
+    container: str | None = Query(default=None),
+    tail_lines: int = Query(default=100, ge=1, le=1000),
+    previous: bool = Query(default=False),
+    timestamps: bool = Query(default=True),
+) -> StreamingResponse:
+    def event_stream():
+        try:
+            for line in service.stream_pod_logs(
+                namespace,
+                pod_name,
+                container=container,
+                tail_lines=tail_lines,
+                previous=previous,
+                timestamps=timestamps,
+            ):
+                yield _sse_event("log", {"line": line})
+        except KubernetesClientError as exc:
+            yield _sse_event("error", {"detail": str(exc)})
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+def _sse_event(event: str, payload: dict[str, str]) -> str:
+    return f"event: {event}\ndata: {json.dumps(payload)}\n\n"

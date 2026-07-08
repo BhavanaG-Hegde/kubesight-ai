@@ -27,6 +27,7 @@
 
 - Connect to a local Kubernetes cluster.
 - List namespaces, deployments, pods, services, pod events, and pod logs.
+- Add authenticated live pod log streaming. Done.
 - Add read-only Kubernetes RBAC manifests.
 
 ## Phase 6: Monitoring And Incident Detection

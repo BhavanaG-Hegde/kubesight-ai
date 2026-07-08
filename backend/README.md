@@ -64,6 +64,7 @@ GET /api/v1/kubernetes/namespaces/{namespace}/pods
 GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}
 GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/events
 GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs
+GET /api/v1/kubernetes/namespaces/{namespace}/pods/{pod_name}/logs/stream
 ```
 
 Monitoring endpoints:
