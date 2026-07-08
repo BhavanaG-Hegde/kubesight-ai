@@ -34,6 +34,7 @@ services:
       MONITORED_CLUSTER_NAME: ${MONITORED_CLUSTER_NAME:-local-cluster}
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      OLLAMA_REQUEST_TIMEOUT_SECONDS: ${OLLAMA_REQUEST_TIMEOUT_SECONDS:-60}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:

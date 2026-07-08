@@ -37,9 +37,9 @@
 
 ## Phase 7: AI Assistant
 
-- Connect to Ollama.
-- Analyze logs and incidents using Llama 3.2.
-- Generate root cause summaries and troubleshooting steps.
+- Connect to Ollama. Done for backend AI endpoints.
+- Analyze logs and incidents using Llama 3.2. Done.
+- Generate root cause summaries and troubleshooting steps. Done.
 
 ## Phase 8: Analytics And Production Polish
 

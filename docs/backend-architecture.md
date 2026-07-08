@@ -34,7 +34,7 @@ API routes
 - `HealthScoringService`: pod and cluster health scores.
 - `IncidentDetectionService`: rule-based incident detection.
 - `MonitoringService`: orchestration for live health assessment and detection.
-- `AIAnalysisService`: Ollama-backed explanations and troubleshooting steps.
+- `AIAssistantService`: Ollama-backed explanations and troubleshooting steps.
 - `AnalyticsService`: dashboard aggregates and chart-ready series.
 
 ## API Principles

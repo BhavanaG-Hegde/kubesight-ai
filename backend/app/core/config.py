@@ -26,6 +26,7 @@ class Settings(BaseSettings):
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3.2"
+    ollama_request_timeout_seconds: int = 60
 
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 

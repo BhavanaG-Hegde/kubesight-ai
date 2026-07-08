@@ -77,3 +77,13 @@ PATCH /api/v1/incidents/{incident_id}
 POST  /api/v1/incidents/sync/namespaces/{namespace}
 POST  /api/v1/incidents/sync/namespaces/{namespace}/pods/{pod_name}
 ```
+
+AI assistant endpoints:
+
+```text
+GET  /api/v1/ai/analyses
+GET  /api/v1/ai/analyses/{analysis_id}
+POST /api/v1/ai/pods/logs/analyze
+POST /api/v1/ai/incidents/{incident_id}/analyze
+POST /api/v1/ai/ask
+```

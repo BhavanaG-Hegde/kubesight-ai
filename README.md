@@ -125,6 +125,16 @@ POST  http://localhost:8000/api/v1/incidents/sync/namespaces/{namespace}
 POST  http://localhost:8000/api/v1/incidents/sync/namespaces/{namespace}/pods/{pod_name}
 ```
 
+AI assistant:
+
+```text
+GET  http://localhost:8000/api/v1/ai/analyses
+GET  http://localhost:8000/api/v1/ai/analyses/{analysis_id}
+POST http://localhost:8000/api/v1/ai/pods/logs/analyze
+POST http://localhost:8000/api/v1/ai/incidents/{incident_id}/analyze
+POST http://localhost:8000/api/v1/ai/ask
+```
+
 ## Architecture Docs
 
 - [Folder structure](docs/folder-structure.md)
@@ -133,3 +143,4 @@ POST  http://localhost:8000/api/v1/incidents/sync/namespaces/{namespace}/pods/{p
 - [Kubernetes integration](docs/kubernetes-integration.md)
 - [Health scoring and incident detection](docs/monitoring-rules.md)
 - [Incident history](docs/incident-history.md)
+- [AI assistant](docs/ai-assistant.md)

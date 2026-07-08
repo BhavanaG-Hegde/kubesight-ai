@@ -39,3 +39,7 @@ class IncidentDetectionError(KubeSightError):
 
 class AIAnalysisError(KubeSightError):
     """Raised when Ollama analysis fails or returns an unusable response."""
+
+
+class AIAnalysisNotFoundError(KubeSightError):
+    """Raised when a saved AI analysis cannot be found."""
